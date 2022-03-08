@@ -50,16 +50,10 @@
                 return newNode;
             }
 
-            private ListNode GetNode(string[] slittedString, byte position)
+            private ListNode? GetNode(string[] slittedString, byte position)
             {
-                ListNode node = new ListNode();
-
-                if (_nodesCache.ContainsKey(slittedString[position]))
-                    node = _nodesCache.GetValueOrDefault(slittedString[position]);
-                else
-                    node = FetchNextNodes(slittedString[position]);
-
-                return node;
+                return _nodesCache.ContainsKey(slittedString[position]) ?
+                    _nodesCache.GetValueOrDefault(slittedString[position]) : FetchNextNodes(slittedString[position]);
             }
 
             private ListNode GetTail()
