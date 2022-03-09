@@ -17,9 +17,6 @@ Console.WriteLine("Hello, World!");
 // Работа метода Deserialize() на разделении строк полученных в результате работа метода Serialize()
 // Всем цифрам в строках прописываются ссылки на соответствующие ноды
 
-// Недостатком такого решения является зависемость реализации метода Deserialize() от Serialize()
-// Также вследствие использования метода Split() в Deserialize() сочетания символов "]:[" и "][" являются заблокированными
-
 var listRandom = new ListRandom();
 
 listRandom.Add("Cat");
@@ -27,9 +24,11 @@ listRandom.Add("Dog", listRandom.Head);
 listRandom.Add("Fish", new ListNode() { Data = "Bug" });
 listRandom.Add("Mamont");
 
-var memoryStream = new MemoryStream();
-listRandom.Serialize(memoryStream);
+using (var memoryStream = new MemoryStream())
+{
+    listRandom.Serialize(memoryStream);
+    listRandom.Deserialize(listRandom.Stream);
+}
 
-listRandom.Deserialize(listRandom.Stream);
 
 

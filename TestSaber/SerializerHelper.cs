@@ -4,13 +4,33 @@ namespace TestSaber
 {
     partial class ListRandom
     {
-        private class SerializerHelper: ListRandom
+        private class SerializerHelper : ListRandom
         {
             private List<string> _nodes;
             private Dictionary<ListNode, int> _nodesCache;
             private ListNode _head;
+            public string Divider { get; private set; }
 
-            public List<string> GetListOfNodes(ListNode head)
+            public SerializerHelper()
+            {
+                Divider = "<==>";
+            }
+
+            public Stream FillStream(ListNode head, Stream s)
+            {
+                var streamWriter = new StreamWriter(s);
+                var nodes = GetListOfNodes(head);
+
+                foreach (var node in nodes)
+                    streamWriter.WriteLine(node ?? string.Empty);
+
+                streamWriter.Flush();
+                s.Seek(0, SeekOrigin.Begin);
+                
+                return s;
+            }
+
+            private List<string> GetListOfNodes(ListNode head)
             {
                 _head = head;
                 _nodesCache = new Dictionary<ListNode, int>();
@@ -27,28 +47,22 @@ namespace TestSaber
                 _nodesCache.Add(node, currentNodeIndex);
 
                 var stringBuilder = new StringBuilder();
-                stringBuilder.Append($"{currentNodeIndex}]:");
-                stringBuilder.Append($"[{node.Data}]");
 
-
-                if (node.Previous != null)
-                    stringBuilder.Append($"[{GetNodeIndex(node.Previous)}]");
-                else
-                    stringBuilder.Append("[#]");
-
-                if (node.Next != null)
-                    stringBuilder.Append($"[{GetNodeIndex(node.Next)}]");
-                else
-                    stringBuilder.Append("[#]");
-
-                if (node.Random != null)
-                    stringBuilder.Append($"[{GetNodeIndex(node.Random)}");
-                else
-                    stringBuilder.Append("[#");
+                stringBuilder.Append($"{currentNodeIndex}{Divider}");
+                stringBuilder.Append(AddLink(node.Previous));
+                stringBuilder.Append(AddLink(node.Next));
+                stringBuilder.Append(AddLink(node.Random));
+                stringBuilder.Append($"{node.Data}");
 
                 _nodes.Add(stringBuilder.ToString());
 
                 return currentNodeIndex;
+            }
+
+            private string AddLink(ListNode node)
+            {
+                return node != null ?
+                    $"{GetNodeIndex(node)}{Divider}" : $"#{Divider}";
             }
 
             private int GetNodeIndex(ListNode node)

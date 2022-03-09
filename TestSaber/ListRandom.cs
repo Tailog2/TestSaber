@@ -21,7 +21,7 @@ namespace TestSaber
             }
             else
             {
-                var newNode = new ListNode() { Data = data };
+                var newNode = new ListNode() { Previous = Tail, Data = data};
                 Tail.Next = newNode;
                 Tail = newNode;
             }
@@ -47,18 +47,12 @@ namespace TestSaber
         {
             if (Count == 0)
                 throw new Exception("The object of class ListRandom does not have any elements");
+             
+            var serialazerHeandler = new SerializerHelper();
+            s = serialazerHeandler.FillStream(Head, s);
 
             Stream = new MemoryStream();
-            var serialazerHeandler = new SerializerHelper();
-            var nodes = serialazerHeandler.GetListOfNodes(Head);
-
-            using var streamWriter = new StreamWriter(s);
-
-            foreach (var node in nodes)
-                streamWriter.WriteLine(node ?? string.Empty);
-
-            s.Seek(0, SeekOrigin.Begin);       
-            s.CopyTo(Stream);
+            s.CopyTo(Stream);      
             Stream.Seek(0, SeekOrigin.Begin);
         }
 
@@ -67,18 +61,9 @@ namespace TestSaber
             if (s == null)
                 throw new NullReferenceException("Please specify the input stream");
 
-            var stringNodes = new List<string>();
-            using var streamReader = new StreamReader(s);
+            var deserializerHandler = new DeserializerHelper(new SerializerHelper());
 
-            while (!streamReader.EndOfStream)
-            {
-                stringNodes.Add(streamReader.ReadLine() ?? "");
-            }
-
-            var deserializerHandler = new DeserializerHelper();
-            deserializerHandler.MapNodes(stringNodes);
-
-            Head = deserializerHandler.Head;
+            Head = deserializerHandler.GetHead(s);
             Tail = deserializerHandler.Tail;
             Count = deserializerHandler.Count;
         }
